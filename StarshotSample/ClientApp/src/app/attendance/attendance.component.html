@@ -1,0 +1,57 @@
+<div class="container">
+    <h3>Attendance</h3>
+    <div class="col-md-12">
+          <ul class="list-group">
+            <li class="list-group-item d-flex justify-content-between align-items-center">
+           
+                 
+                        <div class="row w-100">
+                            <div class="col-md-6">
+                                <input type="date" class="w-100 form-control" [ngModel] ="dt | date:'yyyy-MM-dd'" (ngModelChange)="cn($event)">
+                            </div>
+                            <div class="col-md-6">
+                           
+                            </div>
+                        </div>
+                   
+            </li>
+            <ng-container *ngIf="data.employees.length >0">
+                <li class="list-group-item list-group-item-action list-group-item-dark">
+                    <h4>Has not timed in.</h4>
+                </li>
+            
+                <li *ngFor="let employee of data.employees; let i = index" style="cursor: pointer;" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
+                    {{employee.name}}
+                    <div class="clearfix"></div>
+                    <button (click)="timeIn(employee.id, i)" class="btn btn-primary btn-sm">Time-in</button>
+            
+                </li>
+            </ng-container>
+            <ng-container *ngIf="data.timedInEmployees.length >0">
+                <li class="list-group-item list-group-item-action list-group-item-primary">
+                    <h4>Has timed-in  </h4>
+                </li>
+                <li *ngFor="let d of data.timedInEmployees; let i = index" style="cursor: pointer;" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
+                
+                    <span class="text-primary">{{d.employee.name}}  <span class="text-dark"> {{d.clockIn | date: 'HH:mm:ss'}}</span> </span>  
+
+                    <div class="clearfix"></div>
+                    <button (click)="timeOut(d.employee.id, i)" class="btn btn-success btn-sm">Time-out</button>
+            
+                </li>
+            </ng-container>
+            <ng-container *ngIf="data.timeOutEmployees.length >0">
+                <li class="list-group-item list-group-item-action list-group-item-success">
+                    <h4>Has timed-out</h4>
+                </li>
+       
+                <li *ngFor="let d of data.timeOutEmployees; let i = index" style="cursor: pointer;" class="list-group-item d-flex justify-content-between align-items-center list-group-item-action">
+                    <span class="text-success">{{d.employee.name}}  <span class="text-dark"> {{d.clockIn | date: 'HH:mm:ss'}}</span> - <span class="text-dark"> {{d.clockOut | date: 'HH:mm:ss'}}</span> </span>  
+                    <div class="clearfix"></div>
+                    <button class="btn btn-success btn-sm">Time-out</button>
+            
+                </li>
+            </ng-container>
+        </ul>
+    </div>
+</div>
