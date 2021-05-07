@@ -5,6 +5,7 @@ Technologies used:
  - .NET Core 3.1
  - EF Core, Migration & Fluent API EF Core
  - AutoMapper
+ - MSSQL 
 
 How to run the project
 
