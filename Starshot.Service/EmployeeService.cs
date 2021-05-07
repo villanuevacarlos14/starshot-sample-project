@@ -37,28 +37,28 @@ namespace Starshot.Service
         public async Task<EmployeeAttendanceDTO> TimeOut(int id, DateTime date)
         {
 
-            
+
             var data = await this._dbContext.EmployeeAttendances.Include(x => x.Employee).Where(x => x.ClockIn.HasValue
                && x.ClockIn.Value.Date == date.Date
                && !x.ClockOut.HasValue
                && x.EmployeeId == id).FirstOrDefaultAsync();
 
-                if (data != null)
-                {
-                    var currentDate = DateTime.Now;
-                    data.ClockOut = new DateTime(date.Year, date.Month, date.Day, currentDate.Hour, currentDate.Minute, currentDate.Second);
-                    await this._dbContext.SaveChangesAsync();
+            if (data != null)
+            {
+                var currentDate = DateTime.Now;
+                data.ClockOut = new DateTime(date.Year, date.Month, date.Day, currentDate.Hour, currentDate.Minute, currentDate.Second);
+                await this._dbContext.SaveChangesAsync();
 
-                    return this._mapper.Map<EmployeeAttendanceDTO>(data);
-                }
+                return this._mapper.Map<EmployeeAttendanceDTO>(data);
+            }
 
             return null;
         }
 
         public async Task<EmployeeAttendanceDTO> TimeIn(int id, DateTime date)
         {
-            var data = await this._dbContext.EmployeeAttendances.Include(x=>x.Employee).Where(x => x.ClockIn.HasValue && x.ClockIn.Value.Date == date.Date
-            && x.EmployeeId == id).FirstOrDefaultAsync();
+            var data = await this._dbContext.EmployeeAttendances.Include(x => x.Employee).Where(x => x.ClockIn.HasValue && x.ClockIn.Value.Date == date.Date
+              && x.EmployeeId == id).FirstOrDefaultAsync();
 
             if (data == null)
             {
@@ -83,12 +83,12 @@ namespace Starshot.Service
             var predicate = PredicateBuilder.New<EmployeeAttendance>();
             predicate.And(x => x.ClockIn.HasValue ? x.ClockIn.Value.Date == date.Date : false);
             predicate.And(x => x.ClockOut.HasValue ? x.ClockOut.Value.Date == date.Date : true);
-            var current = this._dbContext.EmployeeAttendances.Include(x=>x.Employee).Where(predicate);
+            var current = this._dbContext.EmployeeAttendances.Include(x => x.Employee).Where(predicate);
 
             var employeesNotLoggedIn = await this._dbContext.Employees.Where(x => !current.Any(r => r.EmployeeId == x.Id)).ToListAsync();
             var timeInEmployees = await current.Where(x => x.ClockIn.HasValue && !x.ClockOut.HasValue).ToListAsync();
             var timeInAndOutEmployees = await current.Where(x => x.ClockIn.HasValue && x.ClockOut.HasValue).ToListAsync();
-           
+
             return new AttendanceDTO()
             {
                 date = date,
@@ -117,11 +117,11 @@ namespace Starshot.Service
                 predicate = predicate.And(x => x.Name.ToLower().Contains(search.ToLower()));
             }
 
-           
+
             switch (active)
             {
                 case 0:
-                 
+
                     break;
                 case 1:
                     predicate = predicate.And(x => x.Active);
@@ -130,19 +130,20 @@ namespace Starshot.Service
                     predicate = predicate.And(x => !x.Active);
                     break;
             }
-            
-           
+
+
             var resp = await _dbContext.Employees
                 .AsNoTracking()
                 .Where(predicate)
-                .OrderBy(x=>x.Name)
+                .OrderBy(x => x.Name)
                 .ToListAsync();
             return this._mapper.Map<IEnumerable<EmployeeDTO>>(resp);
         }
 
         public async Task<EmployeeDTO> GetById(int id)
         {
-            throw new NotImplementedException();
+            var emp = await _dbContext.Employees.FirstOrDefaultAsync(x => x.Id == id);
+            return _mapper.Map<Employee, EmployeeDTO>(emp);
         }
 
         public async Task<int> Save(EmployeeDTO employee)
@@ -154,7 +155,8 @@ namespace Starshot.Service
                 await this._dbContext.SaveChangesAsync();
                 return emp.Id;
             }
-            else {
+            else
+            {
                 var existing = await this._dbContext.Employees.SingleOrDefaultAsync(x => x.Id == employee.Id);
                 existing.Name = employee.Name;
                 existing.Active = employee.Active;
@@ -164,9 +166,9 @@ namespace Starshot.Service
                 return existing.Id;
             }
 
-           
+
         }
 
-     
+
     }
 }
